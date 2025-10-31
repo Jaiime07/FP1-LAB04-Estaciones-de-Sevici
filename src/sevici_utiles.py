@@ -13,9 +13,16 @@ def selecciona_color(estacion:EstacionSevici) -> str:
     Devuelve:
     str: "green", "orange", "red" o "gray"
     """
-    # TODO: Ejercicio 1
-    return "green"
-
+    if estacion.capacidad == 0: #evitamos la división entre 0, que da un error
+        return "gray"
+    d = estacion.bicicletas_disponibles / estacion.capacidad #disponibilidad de la estación
+    if d >= 2/3:
+        return "green"
+    if d >= 1/3:
+        return "orange"
+    if d > 0:
+        return "red"
+    
 def calcula_estadisticas(estaciones: list[EstacionSevici]) -> tuple[int, int, float, int]:
     """
     Calcula estadísticas de las estaciones.
@@ -24,8 +31,21 @@ def calcula_estadisticas(estaciones: list[EstacionSevici]) -> tuple[int, int, fl
     Devuelve:
     tupla con (total de bicicletas libres, total de capacidad, porcentaje de ocupación, total de estaciones)
     """
-    # TODO: Ejercicio 2
-    return (0, 0, 0.0, 0)
+    total_bicicletas_libres = 0
+    total_capacidad = 0
+    total_estaciones = 0
+        
+    for estaciones in estaciones:
+        total_bicicletas_libres += estaciones[6]
+        total_capacidad += estaciones[4]
+        total_estaciones += 1
+   
+    porcentaje_ocupacion = (1 - total_bicicletas_libres / total_capacidad) * 100
+       
+    return total_bicicletas_libres, total_capacidad,porcentaje_ocupacion, total_estaciones
+    
+    
+
 
 def busca_estaciones_direccion(estaciones: list[EstacionSevici], direccion_parcial: str) -> list[EstacionSevici]:
     """
@@ -38,8 +58,16 @@ def busca_estaciones_direccion(estaciones: list[EstacionSevici], direccion_parci
     Devuelve:
     lista de EstacionSevici que cumplen el criterio
     """
-    # TODO: Ejercicio 3
-    return []
+    direccion_parcial=direccion_parcial.lower()
+    res = None
+    for estacion in estaciones:
+        hola = estacion[1].lower()
+        if direccion_parcial in hola:
+            res = estacion
+            break
+    return [res]
+
+        
 
 def busca_estaciones_con_disponibilidad(estaciones:list[EstacionSevici], min_disponibilidad: float = 0.5) -> list[EstacionSevici]:
     """
