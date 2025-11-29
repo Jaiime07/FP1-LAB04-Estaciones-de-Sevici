@@ -31,18 +31,18 @@ def calcula_estadisticas(estaciones: list[EstacionSevici]) -> tuple[int, int, fl
     Devuelve:
     tupla con (total de bicicletas libres, total de capacidad, porcentaje de ocupación, total de estaciones)
     """
-    total_bicicletas_libres = 0
+    total_bicicletas_disponibles = 0
     total_capacidad = 0
     total_estaciones = 0
         
-    for estaciones in estaciones:
-        total_bicicletas_libres += estaciones[6]
-        total_capacidad += estaciones[4]
+    for estacion in estaciones:
+        total_bicicletas_disponibles += estacion.bicicletas_disponibles
+        total_capacidad += estacion.capacidad
         total_estaciones += 1
    
-    porcentaje_ocupacion = (1 - total_bicicletas_libres / total_capacidad) * 100
+    porcentaje_ocupacion = (1 - total_bicicletas_disponibles / total_capacidad) * 100
        
-    return total_bicicletas_libres, total_capacidad,porcentaje_ocupacion, total_estaciones
+    return total_bicicletas_disponibles, total_capacidad, porcentaje_ocupacion, total_estaciones
     
     
 
@@ -58,17 +58,14 @@ def busca_estaciones_direccion(estaciones: list[EstacionSevici], direccion_parci
     Devuelve:
     lista de EstacionSevici que cumplen el criterio
     """
-    direccion_parcial=direccion_parcial.lower()
-    res = None
+    estaciones_direccion_parcial = []
     for estacion in estaciones:
-        hola = estacion[1].lower()
-        if direccion_parcial in hola:
-            res = estacion
-            break
-    return [res]
-
+        if direccion_parcial.lower() in estacion.direccion.lower():
+            estaciones_direccion_parcial.append(estacion)
+    return estaciones_direccion_parcial
         
 
+        
 def busca_estaciones_con_disponibilidad(estaciones:list[EstacionSevici], min_disponibilidad: float = 0.5) -> list[EstacionSevici]:
     """
     Devuelve una lista de EstacionSevici con al menos el porcentaje mínimo de bicicletas disponible
@@ -81,8 +78,13 @@ def busca_estaciones_con_disponibilidad(estaciones:list[EstacionSevici], min_dis
     Devuelve:
     lista de EstacionSevici
     """
-    # TODO: Ejercicio 4
-    return estaciones
+    estaciones_buena_disponibilidad = []
+    for estacion in estaciones:
+        if estacion.capacidad !=0:
+            porcentaje_ocupacion = estacion.bicicletas_disponibles / estacion.capacidad
+            if porcentaje_ocupacion > min_disponibilidad:
+                estaciones_buena_disponibilidad.append(estacion)
+    return estaciones_buena_disponibilidad
 
 def calcula_distancia(p1: tuple[float, float], p2: tuple[float, float]) -> float:
     """
@@ -95,8 +97,7 @@ def calcula_distancia(p1: tuple[float, float], p2: tuple[float, float]) -> float
     Devuelve:
     float: distancia euclídea entre los dos puntos
     """
-    # TODO: Ejercicio 5
-    pass
+    return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)**(1/2)
 
 def busca_estacion_mas_cercana(estaciones:list[EstacionSevici], punto:tuple[float, float]) -> EstacionSevici | None:
     """
@@ -109,8 +110,20 @@ def busca_estacion_mas_cercana(estaciones:list[EstacionSevici], punto:tuple[floa
     Devuelve:
     EstacionSevici más cercana con al menos una bicicleta disponible, o None si no hay ninguna.
     """ 
-    # TODO: Ejercicio 5
-    return None
+    
+    distancia_menor = 100000000000
+    mas_cercana = None
+    for estacion in estaciones:
+        if estacion.bicicletas_disponibles > 0:
+            distancia = calcula_distancia((estacion.latitud, estacion.longitud), (punto[0], punto[1]))
+        
+            if distancia < distancia_menor:
+                distancia_menor = distancia
+                mas_cercana = estacion
+    return mas_cercana
+
+
+
 
 def calcula_ruta(estaciones:list[EstacionSevici], origen:tuple[float, float], destino:tuple[float, float]) -> tuple[EstacionSevici | None, EstacionSevici | None]   :
     """
@@ -124,6 +137,6 @@ def calcula_ruta(estaciones:list[EstacionSevici], origen:tuple[float, float], de
     Devuelve:
     tupla con (estacion_origen, estacion_destino)
     """
-    # TODO: Ejercicio 5
-    pass
+    return  busca_estacion_mas_cercana(estaciones, origen), busca_estacion_mas_cercana(estaciones, destino)
+    
 
